@@ -1,0 +1,1135 @@
+/* ============================================================
+   Manesha & Alkesh — Wedding Invitation
+   Palette tokens, typography, layout, responsive, reduced-motion
+   ============================================================ */
+
+:root {
+  /* Sage & Gold palette */
+  --cream: #f4f2e6; /* page base — sage-tinted cream */
+  --cream-deep: #e9ebda; /* deeper sage cream */
+  --sage: #8a9a5b; /* medium sage green */
+  --sage-mid: #6b7a44; /* mid sage */
+  --sage-deep: #3f5230; /* deep forest green — headings & accents */
+  --gold: #cba43c; /* gold */
+  --gold-soft: #e6cf8f; /* light gold */
+  --gold-ink: #a97e26; /* readable deep gold for display text */
+  --tan: #c9a06a; /* warm tan */
+  --ink: #2e3a20; /* deep green-charcoal — body text */
+  --ink-soft: #5c6a45; /* muted sage-gray — secondary text */
+  --name-color: #37492a; /* deep green for the hero names */
+
+  /* Readable deep sage for small uppercase labels/eyebrows */
+  --label: #55683a;
+
+  /* Type */
+  --font-display: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --font-script: "Great Vibes", "Segoe Script", cursive;
+  --font-body: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+
+  /* Spacing rhythm — smaller floor on phones, generous on desktop */
+  --section-pad: clamp(3.5rem, 11vh, 10rem);
+  --gutter: clamp(1.1rem, 5vw, 4rem);
+  --maxw: 1100px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis handles smoothing; native behavior off */
+  -webkit-text-size-adjust: 100%; /* stop iOS auto-inflating text in landscape */
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden; /* belt-and-braces against any stray horizontal overflow */
+  max-width: 100%;
+}
+
+/* Media never forces horizontal overflow on small screens. */
+img,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 300;
+  color: var(--ink);
+  background: linear-gradient(
+    165deg,
+    #f6f4e9 0%,
+    #eef0e1 30%,
+    #e7ebd7 60%,
+    #eef0e2 82%,
+    #f4f2e7 100%
+  );
+  background-attachment: fixed;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* `background-attachment: fixed` stutters (or is ignored) on touch devices —
+   fall back to a normal scroll attachment there. The fixed sky layer below
+   still provides depth. */
+@media (hover: none), (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
+/* Dreamy soft-sky wash behind everything for extra cheer. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: url("/images/sky.jpg") center / cover no-repeat;
+  opacity: 0.08;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Fine film-grain / paper-foil texture over the whole page. A tiny inline
+   SVG turbulence tile at very low opacity kills the "flat gradient" look and
+   reads as expensive paper. Fixed + pointer-events:none so it never interferes. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* ---------- 3D canvas ---------- */
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%; /* not 100vw — that includes the scrollbar and forces overflow */
+  height: 100vh;
+  height: 100dvh; /* track the visible viewport as mobile bars show/hide */
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* All content sits above the canvas */
+main,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Typography ---------- */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  font-size: clamp(0.74rem, 1.5vw, 0.86rem);
+  font-weight: 500;
+  color: var(--label);
+}
+
+.script-amp {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gold);
+}
+
+/* ---------- Layout helpers ---------- */
+.section {
+  padding: var(--section-pad) var(--gutter);
+  max-width: var(--maxw);
+  margin-inline: auto;
+  text-align: center;
+  position: relative;
+}
+
+/* ---------- Elegant underline along the top of each section ---------- */
+.section::before,
+.site-footer::before {
+  content: "";
+  position: absolute;
+  top: clamp(10px, 2.5vh, 26px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(78%, 560px);
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 162, 75, 0.55) 16%,
+    rgba(201, 162, 75, 0.95) 50%,
+    rgba(201, 162, 75, 0.55) 84%,
+    transparent
+  );
+}
+.site-footer {
+  position: relative;
+}
+
+/* Elegant separator: a fine tapering gold line with a small centred diamond. */
+.divider {
+  width: 100%;
+  max-width: 300px;
+  margin: clamp(1.5rem, 4vh, 2.75rem) auto;
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 162, 75, 0.85) 50%,
+    transparent
+  );
+  position: relative;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.divider::after {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  box-shadow: 0 0 0 4px var(--gold-ink, #a97e26) inset;
+}
+.divider::before {
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(201, 162, 75, 0.7);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  min-height: 100vh;
+  min-height: 100svh; /* fits within the visible area, no address-bar jump */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ---------- Full-width photo band at the top of the hero ---------- */
+.hero__photoband {
+  position: relative;
+  width: 100%;
+  height: clamp(280px, 46vh, 580px);
+  overflow: hidden;
+}
+.hero__photoband img {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 100%;
+  height: 120%; /* headroom so the parallax translate never reveals an edge */
+  object-fit: cover;
+  object-position: center 42%;
+  will-change: transform;
+}
+/* Subtle warm tint to harmonise the photo with the festive palette. */
+.hero__photoband::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(203, 164, 60, 0.16),
+    rgba(90, 106, 69, 0.16)
+  );
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+/* Fade the bottom of the photo into the page's sage-cream gradient. */
+.hero__photoband::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 62%,
+    rgba(244, 242, 230, 0.6) 84%,
+    #f4f2e6 100%
+  );
+}
+
+.hero__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(2rem, 6vh, 4.5rem) var(--gutter) var(--gutter);
+  position: relative;
+}
+
+/* ---------- Countdown ---------- */
+.countdown {
+  display: flex;
+  gap: clamp(0.45rem, 2vw, 1.1rem);
+  justify-content: center;
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  flex-wrap: wrap;
+}
+.countdown__unit {
+  min-width: clamp(58px, 14vw, 88px);
+  padding: clamp(0.6rem, 1.6vw, 1rem) clamp(0.4rem, 1vw, 0.85rem);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(242, 183, 5, 0.55);
+  border-radius: 14px;
+  box-shadow: 0 16px 32px -22px rgba(63, 82, 48, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.countdown__num {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 5vw, 2.7rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--gold-ink);
+}
+.countdown__label {
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--label);
+  margin-top: 0.45rem;
+}
+.countdown__celebrate {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  color: var(--sage-deep);
+}
+
+.hero__eyebrow {
+  margin-bottom: clamp(1rem, 3vh, 2rem);
+}
+
+.hero__names {
+  font-family: var(--font-script);
+  font-size: clamp(3.8rem, 13vw, 8.5rem);
+  line-height: 1.04;
+  font-weight: 400;
+  color: var(--name-color);
+  filter: drop-shadow(0 3px 10px rgba(255, 250, 240, 0.7));
+}
+.hero__names span:not(.script-amp) {
+  display: inline-block;
+}
+.hero__names .script-amp {
+  display: block;
+  font-family: var(--font-script);
+  font-size: clamp(2.4rem, 8vw, 5rem);
+  margin: -0.12em 0;
+  color: var(--gold);
+}
+
+.hero__tagline {
+  margin-top: clamp(1rem, 3vh, 2rem);
+  font-style: italic;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  color: var(--gold-ink);
+}
+/* Keep the hero sub-text crisp over the photo banner. */
+.hero__eyebrow,
+.hero__tagline,
+.hero__date,
+.hero__location {
+  text-shadow: 0 1px 9px rgba(255, 250, 245, 0.9),
+    0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+.hero__date {
+  margin-top: 0.5rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: clamp(0.78rem, 1.8vw, 0.95rem);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.hero__location {
+  margin-top: 0.35rem;
+  letter-spacing: 0.08em;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--label);
+}
+
+.scroll-cue {
+  position: absolute;
+  bottom: clamp(1.5rem, 5vh, 3rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.scroll-cue__line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(var(--sage), transparent);
+  animation: cueDrift 2.4s ease-in-out infinite;
+}
+@keyframes cueDrift {
+  0%,
+  100% {
+    transform: scaleY(0.6);
+    opacity: 0.4;
+    transform-origin: top;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+    transform-origin: top;
+  }
+}
+
+/* ---------- Hanging garland (festive toran) ---------- */
+.garland {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0 clamp(0.5rem, 3vw, 3rem);
+  pointer-events: none;
+  z-index: 3;
+}
+.garland__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: top center;
+  animation: garlandSway 3.4s ease-in-out infinite;
+}
+.garland__item::before {
+  content: "";
+  width: 1.5px;
+  height: clamp(16px, 4vh, 42px);
+  background: linear-gradient(var(--gold), rgba(203, 164, 60, 0.1));
+}
+.garland__item img {
+  width: clamp(24px, 5vw, 46px);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(63, 82, 48, 0.28));
+}
+.garland__item:nth-child(odd) {
+  animation-duration: 3.9s;
+}
+.garland__item:nth-child(3n) {
+  animation-delay: -1.2s;
+}
+.garland__item:nth-child(3n + 1) {
+  animation-delay: -0.6s;
+}
+@keyframes garlandSway {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+/* ============================================================
+   FAMILIES
+   ============================================================ */
+.families__intro {
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  color: var(--sage-deep);
+  font-style: italic;
+}
+.families__grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(1rem, 4vw, 3rem);
+  margin-top: clamp(2rem, 5vh, 3.5rem);
+}
+.families__side {
+  color: var(--ink);
+}
+.families__relation {
+  display: block;
+  font-size: 0.76rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--label);
+  margin-bottom: 0.4rem;
+}
+.families__parents {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+  color: var(--sage-deep);
+  line-height: 1.3;
+}
+.families__home {
+  margin-top: 0.45rem;
+  font-size: 0.96rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.families__amp {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  color: var(--gold);
+}
+.families__blessing {
+  margin-top: clamp(2rem, 5vh, 3rem);
+  max-width: 40ch;
+  margin-inline: auto;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+.timeline__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: clamp(1.25rem, 3vw, 2rem);
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+}
+.event-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate; /* keep the animated ::before layer clipped & behind text */
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(201, 162, 75, 0.28);
+  border-radius: 18px;
+  padding: clamp(1.75rem, 3vw, 2.5rem) clamp(1.25rem, 2.5vw, 2rem);
+  text-align: center;
+  box-shadow: 0 18px 40px -28px rgba(63, 82, 48, 0.45);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s ease, border-color 0.5s ease;
+}
+/* Card content sits above the animated background layer. */
+.event-card > * {
+  position: relative;
+  z-index: 1;
+}
+.event-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(201, 162, 75, 0.7);
+  box-shadow: 0 28px 55px -28px rgba(63, 82, 48, 0.55);
+}
+.event-card__name {
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  color: var(--sage-deep);
+  margin-bottom: 0.75rem;
+}
+.event-card__row {
+  font-size: 1rem;
+  color: var(--ink);
+  margin: 0.2rem 0;
+}
+.event-card__label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--label);
+  margin-top: 0.9rem;
+}
+.event-card__maps {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* comfortable tap target */
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--sage-deep);
+  text-decoration: none;
+  border-bottom: 1px solid var(--sage);
+  transition: color 0.3s, border-color 0.3s;
+}
+.event-card__maps:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+/* ============================================================
+   COUPLE
+   ============================================================ */
+.couple__photo {
+  margin: clamp(2rem, 5vh, 3rem) auto 0;
+  max-width: 560px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 75, 0.4);
+  box-shadow: 0 40px 80px -40px rgba(63, 82, 48, 0.6);
+}
+.couple__photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.couple__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: clamp(2rem, 6vw, 5rem);
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+}
+.person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.person__role {
+  margin-top: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--label);
+}
+.person__name {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  color: var(--ink);
+  margin: 0.35rem 0 0.9rem;
+}
+.person__bio {
+  max-width: 32ch;
+  color: var(--ink);
+  font-size: 1.02rem;
+}
+
+/* ============================================================
+   MESSAGE
+   ============================================================ */
+/* Shared decorative image used as a section accent. */
+.accent-figure {
+  margin: clamp(2rem, 5vh, 3rem) auto 0;
+  max-width: 520px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 75, 0.35);
+  box-shadow: 0 34px 70px -40px rgba(63, 82, 48, 0.55);
+}
+.accent-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Looping couple video accent (landscape 16:9). */
+.accent-figure--video {
+  max-width: 520px;
+  background: var(--cream-deep);
+}
+.accent-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.pets__heading {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--sage-deep);
+  font-style: italic;
+}
+.pets__photo {
+  margin: clamp(2rem, 5vh, 3rem) auto 0;
+  max-width: 380px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 75, 0.35);
+  box-shadow: 0 34px 70px -40px rgba(63, 82, 48, 0.55);
+}
+.pets__photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.pets__caption {
+  display: block;
+  margin-top: clamp(1.25rem, 3vh, 1.75rem);
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ink);
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+}
+
+.message {
+  background: rgba(255, 255, 255, 0.4);
+}
+.message__rings {
+  width: clamp(120px, 22vw, 170px);
+  height: clamp(120px, 22vw, 170px);
+  margin: 0 auto clamp(1.5rem, 4vh, 2.25rem);
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 75, 0.5);
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.5),
+    0 24px 50px -28px rgba(63, 82, 48, 0.55);
+}
+.message__rings img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.message__heading {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--sage-deep);
+  font-style: italic;
+}
+.message__body {
+  max-width: 46ch;
+  margin: clamp(1.5rem, 4vh, 2.25rem) auto 0;
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  color: var(--ink);
+  font-family: var(--font-display);
+  line-height: 1.7;
+}
+.message__signoff {
+  display: block;
+  margin-top: clamp(1.5rem, 4vh, 2.25rem);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  color: var(--gold-ink);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer {
+  text-align: center;
+  padding: clamp(4rem, 10vh, 7rem) var(--gutter) clamp(2.5rem, 6vh, 4rem);
+}
+.site-footer__closing {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.2rem, 3.5vw, 2rem);
+  color: var(--sage-deep);
+}
+.site-footer__initials {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 6rem);
+  color: var(--gold-ink);
+  margin: clamp(1rem, 3vh, 1.75rem) 0 0.25rem;
+  letter-spacing: 0.05em;
+}
+.site-footer__date {
+  letter-spacing: 0.36em;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.site-footer__contact {
+  margin-top: clamp(1.5rem, 4vh, 2.25rem);
+  font-size: 0.96rem;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+}
+.site-footer__host {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1rem, 2.6vw, 1.25rem);
+  color: var(--gold-ink);
+}
+
+/* ============================================================
+   Reveal animation base state (GSAP toggles .is-visible)
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ============================================================
+   Enhancements — progress bar, foil shimmer, glass, motifs, micro-interactions
+   ============================================================ */
+
+/* Scroll-progress: a thin gold line with a glowing diya at the leading edge. */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 50;
+  pointer-events: none;
+}
+.scroll-progress__fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(
+    90deg,
+    var(--gold),
+    var(--gold) 60%,
+    var(--gold-soft)
+  );
+  box-shadow: 0 0 10px rgba(242, 183, 5, 0.85);
+  position: relative;
+}
+.scroll-progress__fill::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6d8, var(--gold) 55%, transparent 74%);
+  box-shadow: 0 0 14px 4px rgba(255, 200, 60, 0.75);
+}
+
+/* Gold-foil shimmer sweeping slowly across the closing monogram. */
+.site-footer__initials {
+  background: linear-gradient(
+    100deg,
+    var(--gold) 0%,
+    var(--gold) 36%,
+    #fff3c4 50%,
+    var(--gold) 64%,
+    var(--gold) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: foilSweep 7s ease-in-out infinite;
+}
+@keyframes foilSweep {
+  0%,
+  100% {
+    background-position: 150% 0;
+  }
+  50% {
+    background-position: -50% 0;
+  }
+}
+
+/* Liquid-glass refinement for the glass cards. */
+.event-card,
+.countdown__unit {
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.62),
+    rgba(255, 255, 255, 0.34)
+  );
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 18px 42px -26px rgba(63, 82, 48, 0.55);
+}
+
+/* ============================================================
+   Distinct animated background per celebration card.
+   Each keeps a light, frosted base (text stays readable) with a
+   gently moving tinted layer in the ::before, one hue per event.
+   ============================================================ */
+.event-card--sangeet,
+.event-card--wedding,
+.event-card--reception {
+  border-color: rgba(201, 162, 75, 0.4);
+}
+.event-card--sangeet::before,
+.event-card--wedding::before,
+.event-card--reception::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Sangeet — festive gold: a slowly rotating golden shimmer. */
+.event-card--sangeet {
+  background: linear-gradient(
+    150deg,
+    rgba(255, 250, 235, 0.72),
+    rgba(249, 238, 208, 0.5)
+  );
+}
+.event-card--sangeet::before {
+  background: conic-gradient(
+    from 0deg,
+    rgba(203, 164, 60, 0),
+    rgba(230, 207, 143, 0.42),
+    rgba(203, 164, 60, 0),
+    rgba(230, 207, 143, 0.42),
+    rgba(203, 164, 60, 0)
+  );
+  animation: cardSpin 16s linear infinite;
+}
+
+/* Wedding — sage garden: a soft green glow that breathes. */
+.event-card--wedding {
+  background: linear-gradient(
+    150deg,
+    rgba(244, 247, 235, 0.72),
+    rgba(226, 235, 210, 0.5)
+  );
+}
+.event-card--wedding::before {
+  background: radial-gradient(
+    circle at 50% 38%,
+    rgba(138, 154, 91, 0.45),
+    rgba(138, 154, 91, 0) 62%
+  );
+  animation: cardPulse 6.5s ease-in-out infinite;
+}
+
+/* Reception — warm evening: a tan sheen drifting across. */
+.event-card--reception {
+  background: linear-gradient(
+    150deg,
+    rgba(250, 243, 230, 0.72),
+    rgba(238, 226, 202, 0.5)
+  );
+}
+.event-card--reception::before {
+  inset: -60%;
+  background: linear-gradient(
+    115deg,
+    rgba(201, 160, 106, 0) 22%,
+    rgba(201, 160, 106, 0.42) 50%,
+    rgba(201, 160, 106, 0) 78%
+  );
+  background-size: 220% 220%;
+  animation: cardDrift 9s ease-in-out infinite;
+}
+
+@keyframes cardSpin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes cardPulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.9;
+  }
+}
+@keyframes cardDrift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Dividers "draw" open from the centre when revealed; the diamond pops last. */
+.divider.reveal {
+  opacity: 0;
+  transform: scaleX(0.15);
+  transform-origin: center;
+}
+.divider.reveal.is-visible {
+  opacity: 1;
+  transform: scaleX(1);
+}
+.divider.reveal::before,
+.divider.reveal::after {
+  opacity: 0;
+  transition: opacity 0.6s ease 0.45s;
+}
+.divider.reveal.is-visible::before,
+.divider.reveal.is-visible::after {
+  opacity: 1;
+}
+
+/* Micro-interaction: map links lift and glow on hover. */
+.event-card__maps {
+  transition: color 0.3s, border-color 0.3s, transform 0.3s, text-shadow 0.3s;
+}
+.event-card__maps:hover {
+  transform: translateY(-2px);
+  text-shadow: 0 0 12px rgba(242, 183, 5, 0.6);
+}
+.event-card__maps:active {
+  transform: translateY(0);
+}
+
+/* Faint rotating mandala motif behind the families & message sections. */
+.mandala {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(92%, 620px); /* keep within the section so it never overflows x */
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.08;
+  z-index: -1;
+  pointer-events: none;
+  animation: mandalaSpin 90s linear infinite;
+}
+@keyframes mandalaSpin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* ============================================================
+   Responsive — mobile-first tuning
+   ============================================================ */
+
+/* Tablets & large phones */
+@media (max-width: 768px) {
+  .hero__photoband {
+    height: clamp(220px, 38vh, 360px);
+  }
+  /* Wide tracking can push the eyebrow onto two ragged lines on narrow
+     screens — ease it off and let it wrap gracefully. */
+  .eyebrow {
+    letter-spacing: 0.3em;
+  }
+  /* Cards already collapse via auto-fit; make sure they never feel cramped. */
+  .timeline__cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Phones */
+@media (max-width: 640px) {
+  .families__grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .families__amp {
+    transform: rotate(0);
+  }
+  .couple__grid {
+    gap: clamp(2rem, 8vw, 3rem);
+  }
+  /* Pull the hero names down a touch so the long script ascenders/descenders
+     never clip against the photo band above. */
+  .hero__names {
+    font-size: clamp(3.2rem, 16vw, 6rem);
+  }
+}
+
+/* Small phones — keep the countdown tidy as a 2×2 grid instead of a
+   wrapping flex row, and trim oversized display type. */
+@media (max-width: 430px) {
+  .countdown {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+    max-width: 320px;
+    margin-inline: auto;
+  }
+  .countdown__unit {
+    min-width: 0;
+    width: 100%;
+  }
+  .scroll-cue {
+    display: none; /* the hero is already tall; reclaim the space */
+  }
+  .site-footer__initials {
+    font-size: clamp(2.6rem, 18vw, 4rem);
+  }
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .scroll-cue__line,
+  .garland__item,
+  .section::before,
+  .site-footer::before,
+  .mandala,
+  .site-footer__initials {
+    animation: none;
+  }
+  .event-card {
+    transition: none;
+  }
+  .event-card--sangeet::before,
+  .event-card--wedding::before,
+  .event-card--reception::before {
+    animation: none;
+  }
+  /* Keep the parallax hero image static. */
+  .hero__photoband img {
+    transform: none !important;
+  }
+}
