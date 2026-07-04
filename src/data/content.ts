@@ -126,7 +126,7 @@ export const content = {
     closing: "We look forward to celebrating with you",
     initials: "A & M",
     date: "23 . 08 . 2026",
-    contact: "For enquiries: 8891216995 · 7736530296",
+    contact: "For enquiries: 9496428125 · 9446225712",
     host: "Sharing the happiness, Aarish Rajeev & Anupama Abhayan",
   },
 };
